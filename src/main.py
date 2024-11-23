@@ -5,9 +5,7 @@ from dbus.service import Object, BusName, method, signal
 from dbus.mainloop.glib import DBusGMainLoop
 
 from gi.repository import GLib
-
-# from modules.scanner import Scanner
-from .scanner import Scanner
+from modules.scanner import Scanner
 
 DBusGMainLoop(set_as_default=True)
 
@@ -18,31 +16,24 @@ class QRService(Object):
         self.bus = dbus.SessionBus()
         self.name = BusName("com.github.XtremeTHN.QRScanner", self.bus)
 
-        super().__init__(self.bus, "/com/github/XtremeTHN/QRScanner", self.name)
+        self.decoded_data = []
 
-        # self.scanner = Scanner(self)
+        super().__init__(self.bus, "/com/github/XtremeTHN/QRScanner", self.name)
+        self.scanner = Scanner(self)
 
     def run(self):
         self.mainloop.run()
 
     @method(dbus_interface="com.github.XtremeTHN.QRScanner")
-    def start_scan(self):
+    def StartScan(self):
         ...
-        # self.scanner.scan_from_webcam()
+        self.scanner.scan()
 
-    @method(dbus_interface="com.github.XtremeTHN.QRScanner", out_signature="s")
-    def get_data(self):
-        ...
-        # return self.scanner.get_result()
-
-    @method(dbus_interface="com.github.XtremeTHN.QRScanner")
-    def stop_scan(self):
-        ...
-        # self.scanner.stop_scan_from_webcam()
-
-    @signal(dbus_interface="com.github.XtremeTHN.QRScanner")
-    def detected_qr(self):
-        print("Detected qr")
+    @signal(dbus_interface="com.github.XtremeTHN.QRScanner", signature="s")
+    def DetectedQR(self, content: str):
+        pass
 
 if __name__ == "__main__":
-    QRService().run()
+    service = QRService()
+    service.run()
+    service.scanner.release()
