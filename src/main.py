@@ -36,4 +36,3 @@ class QRService(Object):
 if __name__ == "__main__":
     service = QRService()
     service.run()
-    service.scanner.release()
